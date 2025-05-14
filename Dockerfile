@@ -17,7 +17,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Use OpenJDK 11 as a base image to run the app
-FROM openjdk:17-jre-slim
+FROM openjdk:17-slim
 
 # Copy the built JAR file from the previous image
 COPY --from=build /app/target/test-spring-0.0.1-SNAPSHOT.jar /app/test-spring.jar
