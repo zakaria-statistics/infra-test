@@ -1,14 +1,11 @@
 # === Build Stage ===
-FROM maven:3.8.1-eclipse-temurin-17 AS build
+FROM maven:3.8.7-openjdk-17 AS build
 
 WORKDIR /app
 
-# Copy only pom.xml first to cache dependencies
 COPY pom.xml .
-
 RUN mvn dependency:go-offline
 
-# Copy source code
 COPY src ./src
 
 RUN mvn clean package -DskipTests
