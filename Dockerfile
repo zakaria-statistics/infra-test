@@ -1,29 +1,25 @@
-# Use the official Maven image to build the app
-FROM maven:3.8.1-openjdk-17-slim as build
+# === Build Stage ===
+FROM maven:3.8.1-eclipse-temurin-17 AS build
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the pom.xml and dependencies to the container
+# Copy only pom.xml first to cache dependencies
 COPY pom.xml .
 
-# Download the dependencies
 RUN mvn dependency:go-offline
 
-# Copy the entire project
+# Copy source code
 COPY src ./src
 
-# Build the application
 RUN mvn clean package -DskipTests
 
-# Use OpenJDK 11 as a base image to run the app
-FROM openjdk:17-slim
+# === Runtime Stage ===
+FROM eclipse-temurin:17-jre
 
-# Copy the built JAR file from the previous image
-COPY --from=build /app/target/test-spring-0.0.1-SNAPSHOT.jar /app/test-spring.jar
+WORKDIR /app
 
-# Expose the port the app will run on
+COPY --from=build /app/target/test-spring-0.0.1-SNAPSHOT.jar ./app.jar
+
 EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "/app/test-spring.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
